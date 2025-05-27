@@ -23,7 +23,7 @@ if __name__=="__main__":
         1: {'mu': 2, 'sigma': 2, 'min': 0, 'max': 5},  # N(2, 2) for a1=1
         2: {'mu': 1, 'sigma': 2, 'min': 0, 'max': 5}   # N(1, 2) for a1=2
 } 
-    COLORS = { 1 : 'green', 2: 'red'} # plot colar depends on race only
+    COLORS = { 1 : 'green', 2: 'red', 3: 'yellow', 4: 'blue'} # plot colar depends on race only
 
 
 ### simulation

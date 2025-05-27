@@ -24,8 +24,9 @@ def initialize_grid(num_agents, num_attributes, a1_values, P_A2_GIVEN_A1):
             # Generate a2 based on conditional probability P(a2|a1)
             mu, sigma = P_A2_GIVEN_A1[a1]['mu'], P_A2_GIVEN_A1[a1]['sigma']
             a, b = (0 - mu) / sigma, (5 - mu) / sigma  # Standardize bounds
-            a2_values = truncnorm.rvs(a, b, loc=mu, scale=sigma, size=num_for_a1)
-
+            a2_values = np.round(truncnorm.rvs(a, b, loc=mu, scale=sigma, size=num_for_a1), 0).astype(int)
+            a2_values = np.clip(a2_values, 0, 5)
+            # print(a2_values)
             for a2 in a2_values:
                 if agent_positions:
                     pos = agent_positions.pop()
