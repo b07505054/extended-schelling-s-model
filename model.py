@@ -91,13 +91,13 @@ def simulate(num_attributes, tau_u, tau_s, max_iter, NUM_AGENTS, a1_values, P_A2
                 grid[vacant] = agent['id']
                 agent['pos'] = vacant
         segregation = compute_segregation(grid, agents)
-        print(f"segregation in in iteration {iteration}: {segregation}")
         
-        if iteration % 100 == 0 or iteration == 0:
+        
+        if iteration % 10 == 0 or iteration == 0:
+            print(f"segregation in in iteration {iteration}: {segregation}")
             grid_setting.plot_grid(grid, agents, num_attributes, iteration, segregation, COLORS)
         iteration += 1
-        segregation = compute_segregation(grid, agents)
-        grid_setting.plot_grid(grid, agents, num_attributes, iteration, segregation, COLORS)
+        
     return iteration, segregation
 
     

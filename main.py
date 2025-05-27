@@ -12,7 +12,7 @@ if __name__=="__main__":
       
     POP_DENSITY = 0.8  # population density
     NUM_AGENTS = int(L * W * POP_DENSITY)
-    MAX_ITER_2 = 10  # Max iterations for 2-attribute model
+    MAX_ITER_2 = 1000  # Max iterations for 2-attribute model
     MAX_ITER_3 = 2000  # Max iterations for 3-attribute model
     TAU_U = 0.8  # Utility threshold 
     TAU_S_2 = 0.5  # Similarity threshold for 2-attribute 
