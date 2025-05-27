@@ -2,9 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial.distance import hamming
 import random, main
+from scipy.stats import truncnorm
 
-
-def initialize_grid(num_agents, num_attributes):
+def initialize_grid(num_agents, num_attributes, a1_values, P_A2_GIVEN_A1):
     """Initialize grid with agents and attributes."""
     grid = np.zeros((main.L, main.W), dtype=int)  # 0 for empty
     agent_positions = random.sample([(i, j) for i in range(main.L) for j in range(main.W)], num_agents)
@@ -13,38 +13,33 @@ def initialize_grid(num_agents, num_attributes):
     
     # Generate possible attribute combinations
     if num_attributes == 2:
-        attributes_list = [(a1, a2) for a1 in [1, 2] for a2 in [1, 2]]
-    else:
-        attributes_list = [(a1, a2, a3) for a1 in [1, 2] for a2 in [1, 2] for a3 in [1, 2]]
-    
-    # Assign attributes to agents evenly
-    agents_per_type = num_agents // len(attributes_list)
-    for attr in attributes_list:
-        for _ in range(agents_per_type):
-            if agent_positions:
-                pos = agent_positions.pop()
-                grid[pos] = agent_id
-                agents.append({'id': agent_id, 'pos': pos, 'attributes': attr})
-                agent_id += 1
-    
-    # Fill remaining agents randomly
-    while agent_positions:
-        pos = agent_positions.pop()
-        attr = random.choice(attributes_list)
-        grid[pos] = agent_id
-        agents.append({'id': agent_id, 'pos': pos, 'attributes': attr})
-        agent_id += 1
-    
+        
+        agents_per_a1 = num_agents // len(a1_values)
+        remaining_agents = num_agents % len(a1_values)
+        
+        for a1 in a1_values:
+            num_for_a1 = agents_per_a1 + (1 if remaining_agents > 0 else 0)
+            remaining_agents -= 1 if remaining_agents > 0 else 0
+
+            # Generate a2 based on conditional probability P(a2|a1)
+            mu, sigma = P_A2_GIVEN_A1[a1]['mu'], P_A2_GIVEN_A1[a1]['sigma']
+            a, b = (0 - mu) / sigma, (5 - mu) / sigma  # Standardize bounds
+            a2_values = truncnorm.rvs(a, b, loc=mu, scale=sigma, size=num_for_a1)
+
+            for a2 in a2_values:
+                if agent_positions:
+                    pos = agent_positions.pop()
+                    attr = (a1, a2)
+                    grid[pos] = agent_id
+                    agents.append({'id': agent_id, 'pos': pos, 'attributes': attr})
+                    agent_id += 1
+        
     return grid, agents
-def plot_grid(grid, agents, num_attributes, iteration, segregation):
+
+def plot_grid(grid, agents, num_attributes, iteration, segregation,COLORS):
     """Plot the grid with color-coded agents."""
     
-    # Colors for agent types
-    COLORS_2 = { (1,1): 'green', (1,2): 'yellow', (2,1): 'red', (2,2): 'blue' }
-    COLORS_3 = {
-        (1,1,1): 'green', (1,1,2): 'yellow', (1,2,1): 'red', (1,2,2): 'blue',
-        (2,1,1): 'orange', (2,1,2): 'purple', (2,2,1): 'grey', (2,2,2): 'cyan'
-    }
+    # Colors for agent types  
     
     plt.figure(figsize=(10, 8))
     image = np.zeros((main.L, main.W, 3))
@@ -54,8 +49,8 @@ def plot_grid(grid, agents, num_attributes, iteration, segregation):
                 image[i, j] = [1, 1, 1]  # White for empty
             else:
                 agent = next(a for a in agents if a['id'] == grid[i, j])
-                attr = agent['attributes']
-                color = COLORS_2[attr] if num_attributes == 2 else COLORS_3[attr]
+                attr = agent['attributes'][0]
+                color = COLORS[attr]
                 if color == 'green':
                     image[i, j] = [0, 1, 0]
                 elif color == 'yellow':

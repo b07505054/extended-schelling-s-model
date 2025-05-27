@@ -4,28 +4,32 @@ from scipy.spatial.distance import hamming
 import random
 import grid_setting
 from model import simulate
-L, W = 150, 125 # Grid size
+L, W = 50, 50 # Grid size
+
 if __name__=="__main__":
 #### variable setting 
     # Grid and simulation parameters
       
-    POP_DENSITY = 0.8  # 80% population density
+    POP_DENSITY = 0.8  # population density
     NUM_AGENTS = int(L * W * POP_DENSITY)
-    MAX_ITER_2 = 1000  # Max iterations for 2-attribute model
+    MAX_ITER_2 = 10  # Max iterations for 2-attribute model
     MAX_ITER_3 = 2000  # Max iterations for 3-attribute model
-    TAU_U = 0.5  # Utility threshold (50%)
-    TAU_S_2 = 0.25  # Similarity threshold for 2-attribute (25%)
-    TAU_S_3 = 0.5   # Similarity threshold for 3-attribute (50%)
-
+    TAU_U = 0.8  # Utility threshold 
+    TAU_S_2 = 0.5  # Similarity threshold for 2-attribute 
+    TAU_S_3 = 0.5   # Similarity threshold for 3-attribute 
     
+    a1_values = [1,2] # attribure 1 : race 
+    P_A2_GIVEN_A1 = {
+        1: {'mu': 2, 'sigma': 2, 'min': 0, 'max': 5},  # N(2, 2) for a1=1
+        2: {'mu': 1, 'sigma': 2, 'min': 0, 'max': 5}   # N(1, 2) for a1=2
+} 
+    COLORS = { 1 : 'green', 2: 'red'} # plot colar depends on race only
+
+
 ### simulation
     random.seed(42)  # For reproducibility
-    # Run 2-attribute model
-    print("Running 2-attribute model...")
-    iter_2, seg_2 = simulate(2, TAU_U, TAU_S_2, MAX_ITER_2,NUM_AGENTS)
-    print(f"2-attribute model converged in {iter_2} iterations with segregation level {seg_2}")
-    
-    # Run 3-attribute model
-    print("Running 3-attribute model...")
-    iter_3, seg_3 = simulate(3, TAU_U, TAU_S_3, MAX_ITER_3,NUM_AGENTS)
-    print(f"3-attribute model converged in {iter_3} iterations with segregation level {seg_3}")
+    # Run  model
+    print("Runningmodel...")
+    iter_2, seg_2 = simulate(2, TAU_U, TAU_S_2, MAX_ITER_2, NUM_AGENTS, a1_values, P_A2_GIVEN_A1, COLORS)
+    print(f"model converged in {iter_2} iterations with segregation level {seg_2}")
+        

@@ -32,7 +32,8 @@ def is_satisfied(grid, agents, agent, tau_u, tau_s):
     for n_pos in neighbors:
         neighbor_id = grid[n_pos]
         neighbor = next(a for a in agents if a['id'] == neighbor_id)
-        if compute_similarity(agent['attributes'], neighbor['attributes']) >= tau_s:
+        similarity = compute_similarity(agent['attributes'], neighbor['attributes'])   
+        if  similarity >= tau_s:
             similar_neighbors += 1
     theta = similar_neighbors / len(neighbors)
     return theta >= tau_u
@@ -68,15 +69,15 @@ def compute_segregation(grid, agents):
         for n_pos in neighbors:
             neighbor_id = grid[n_pos]
             neighbor = next(a for a in agents if a['id'] == neighbor_id)
-            if agent['attributes'] == neighbor['attributes']:
+            if agent['attributes'][0] == neighbor['attributes'][0]:
                 segregation += 1
     return segregation
 
 
 
-def simulate(num_attributes, tau_u, tau_s, max_iter,NUM_AGENTS):
+def simulate(num_attributes, tau_u, tau_s, max_iter, NUM_AGENTS, a1_values, P_A2_GIVEN_A1, COLORS):
     """Run the simulation for the extended Schelling model."""
-    grid, agents = grid_setting.initialize_grid(NUM_AGENTS, num_attributes)
+    grid, agents = grid_setting.initialize_grid(NUM_AGENTS, num_attributes, a1_values, P_A2_GIVEN_A1)
     iteration = 0
     while iteration < max_iter:
         unsatisfied = [a for a in agents if not is_satisfied(grid, agents, a, tau_u, tau_s)]
@@ -90,11 +91,13 @@ def simulate(num_attributes, tau_u, tau_s, max_iter,NUM_AGENTS):
                 grid[vacant] = agent['id']
                 agent['pos'] = vacant
         segregation = compute_segregation(grid, agents)
+        print(f"segregation in in iteration {iteration}: {segregation}")
+        
         if iteration % 100 == 0 or iteration == 0:
-            grid_setting.plot_grid(grid, agents, num_attributes, iteration, segregation)
+            grid_setting.plot_grid(grid, agents, num_attributes, iteration, segregation, COLORS)
         iteration += 1
-    segregation = compute_segregation(grid, agents)
-    grid_setting.plot_grid(grid, agents, num_attributes, iteration, segregation)
+        segregation = compute_segregation(grid, agents)
+        grid_setting.plot_grid(grid, agents, num_attributes, iteration, segregation, COLORS)
     return iteration, segregation
 
     
